@@ -12,6 +12,7 @@ import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.websocket.server.WebSocketUpgradeFilter;
 
+import javax.servlet.DispatcherType;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -19,6 +20,7 @@ import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.net.InetSocketAddress;
+import java.util.EnumSet;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public final class ServerWrapper {
@@ -46,6 +48,7 @@ public final class ServerWrapper {
 
         ServletContextHandler servletContextHandler = new ServletContextHandler(ServletContextHandler.SESSIONS);
         servletContextHandler.setContextPath("/");
+        servletContextHandler.addFilter(RemoteAddrFilter.class, "/socket.io/*", EnumSet.of(DispatcherType.REQUEST));
         
         /*
         An alternative way of handling the CORS.
