@@ -20,7 +20,16 @@ public class Main {
             @Override
             public void call(Object... args) {
                 SocketIoSocket socket = (SocketIoSocket) args[0];
-                System.out.println(socket.getId());
+                System.out.println("Client " + socket.getId() + " (" + socket.getInitialHeaders().get("remote_addr") + ") has connected.");
+
+                socket.on("message", new Emitter.Listener() {
+                    @Override
+                    public void call(Object... args) {
+                        System.out.println("[Client " + socket.getId() + "] " + args);
+                        socket.send("message", "test message", 1);
+                    }
+                });
+                
             }
         });
         
