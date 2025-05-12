@@ -7,6 +7,7 @@
     <groupId>me.mariodev</groupId>
     <artifactId>socketio-server-java-demo</artifactId>
     <version>1.0</version>
+
     <build>
         <plugins>
             
@@ -38,7 +39,7 @@
         <dependency>
             <groupId>io.socket</groupId>
             <artifactId>socket.io-server</artifactId>
-            <version>3.0.2</version>
+            <version>4.1.2</version>
        </dependency>
 
         <dependency>
@@ -50,37 +51,46 @@
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-server</artifactId>
-            <version>9.4.19.v20190610</version>
+          <version>${jetty.version}</version>
         </dependency>
         
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-servlet</artifactId>
-            <version>9.4.19.v20190610</version>
+          <version>${jetty.version}</version>
         </dependency>
+
+      <!-- https://mvnrepository.com/artifact/org.slf4j/slf4j-simple -->
+      <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>slf4j-simple</artifactId>
+        <version>2.0.17</version>
+      </dependency>
+
+      <!-- https://mvnrepository.com/artifact/org.eclipse.jetty.websocket/websocket-jetty-server -->
+      <dependency>
+        <groupId>org.eclipse.jetty.websocket</groupId>
+        <artifactId>websocket-jetty-server</artifactId>
+        <version>${jetty.version}</version>
+      </dependency>
         
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-servlets</artifactId>
-            <version>9.4.19.v20190610</version>
+          <version>${jetty.version}</version>
         </dependency>
-        
-        <dependency>
-            <groupId>org.eclipse.jetty.websocket</groupId>
-            <artifactId>websocket-server</artifactId>
-            <version>9.4.19.v20190610</version>
-        </dependency>
-        
+
+
         <dependency>
             <groupId>io.socket</groupId>
             <artifactId>engine.io-server</artifactId>
-            <version>5.0.0</version>
+            <version>6.3.2</version>
         </dependency>
-        
+
         <dependency>
             <groupId>io.socket</groupId>
             <artifactId>engine.io-server-jetty</artifactId>
-            <version>5.0.0</version>
+            <version>6.2.1</version>
         </dependency>
 
     </dependencies>
@@ -88,6 +98,7 @@
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
+        <jetty.version>11.0.15</jetty.version>
     </properties>
 
 </project>
