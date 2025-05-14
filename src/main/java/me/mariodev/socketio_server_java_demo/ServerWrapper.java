@@ -2,26 +2,24 @@ package me.mariodev.socketio_server_java_demo;
 
 import io.socket.engineio.server.EngineIoServer;
 import io.socket.engineio.server.EngineIoServerOptions;
-import io.socket.engineio.server.JettyWebSocketHandler;
 import io.socket.socketio.server.SocketIoServer;
-import org.eclipse.jetty.http.pathmap.ServletPathSpec;
+import jakarta.servlet.DispatcherType;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequestWrapper;
+import jakarta.servlet.http.HttpServletResponse;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.HandlerList;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
-import org.eclipse.jetty.websocket.server.WebSocketUpgradeFilter;
 
-import javax.servlet.DispatcherType;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletRequestWrapper;
-import javax.servlet.http.HttpServletResponse;
+
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.EnumSet;
 import java.util.concurrent.atomic.AtomicInteger;
+import org.eclipse.jetty.websocket.server.config.JettyWebSocketServletContainerInitializer;
 
 public final class ServerWrapper {
     private static AtomicInteger PORT_START = null;
@@ -48,7 +46,8 @@ public final class ServerWrapper {
 
         ServletContextHandler servletContextHandler = new ServletContextHandler(ServletContextHandler.SESSIONS);
         servletContextHandler.setContextPath("/");
-        servletContextHandler.addFilter(RemoteAddrFilter.class, "/socket.io/*", EnumSet.of(DispatcherType.REQUEST));
+        servletContextHandler.addFilter(RemoteAddrFilter.class, "/socket.io/*", EnumSet.of(
+            DispatcherType.REQUEST));
         
         /*
         An alternative way of handling the CORS.
@@ -64,25 +63,25 @@ public final class ServerWrapper {
         */
         
         servletContextHandler.addServlet(new ServletHolder(new HttpServlet() {
+
             @Override
             protected void service(HttpServletRequest request, HttpServletResponse response) throws IOException {
                 mEngineIoServer.handleRequest(new HttpServletRequestWrapper(request) {
                     @Override
                     public boolean isAsyncSupported() {
-                        return false;
+                        return true;
                     }
                 }, response);
             }
         }), "/socket.io/*");
 
-        try {
-            WebSocketUpgradeFilter webSocketUpgradeFilter = WebSocketUpgradeFilter.configureContext(servletContextHandler);
-            webSocketUpgradeFilter.addMapping(
-                    new ServletPathSpec("/socket.io/*"),
-                    (servletUpgradeRequest, servletUpgradeResponse) -> new JettyWebSocketHandler(mEngineIoServer));
-        } catch (ServletException ex) {
-            ex.printStackTrace();
-        }
+        // Ensure that JettyWebSocketServletContainerInitializer is initialized,
+// to setup the JettyWebSocketServerContainer for this web application context.
+        JettyWebSocketServletContainerInitializer.configure(servletContextHandler, null);
+
+// Add a WebSocket-initializer Servlet to register WebSocket endpoints.
+        final ServletHolder holder = new ServletHolder(new SocketIoJettyWebsocketInitializerServlet(mEngineIoServer));
+        servletContextHandler.addServlet(holder, "/*");
 
         HandlerList handlerList = new HandlerList();
         handlerList.setHandlers(new Handler[] { servletContextHandler });
